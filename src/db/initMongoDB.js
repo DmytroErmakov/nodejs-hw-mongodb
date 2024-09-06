@@ -11,7 +11,9 @@ export const initMongoBD = async () => {
 
     const DB_HOST = `mongodb+srv://${user}:${password}@${url}/${db}?retryWrites=true&w=majority&appName=Cluster0`;
     await mongoose.connect(DB_HOST);
-    console.log('MongoDB connection succesfully');
+
+    
+  console.log('MongoDB connection succesfully');
   } catch (error) {
     console.log('MongoDB connection error', error.message);
     throw error;
