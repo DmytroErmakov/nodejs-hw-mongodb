@@ -3,6 +3,9 @@ import cors from 'cors';
 import pino from 'pino-http';
 import { env } from './utils/env.js';
 
+import * as contactServices from "./services/contacts.js";
+
+
 // це ми замінили ф-єю env
 // import dotenv from "dotenv";
 // dotenv.config();
@@ -21,7 +24,33 @@ export const startServer = () => {
   app.use(cors());
   app.use(express.json());
 
-  // routes
+    // routes
+    app.get("/contacts", async (req, res) => {
+        const data = await contactServices.getAllContacts();
+
+        res.json({
+            status: 200,
+            message: "Successsfully found contacts",
+            data,
+        })
+    });
+
+    app.get("contact/:id", async (req, res) => {
+        const { id } = req.params;
+        const data = await contactServices.getContactById(id);
+
+        if (!data) {
+           return res.status(404).json({
+                message: `Contact with id=${id} not found`
+            });
+        }
+
+        res.json({
+            status: 200,
+            message: `Contact wit ${id} successfully find`,
+            data,
+        })
+    })
 
   app.use((req, res) => {
     res.status(404).json({
