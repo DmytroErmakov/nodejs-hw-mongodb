@@ -1,0 +1,36 @@
+import mongoose from 'mongoose';
+
+import { env } from '../utils/env.js';
+
+
+
+
+export const initMongoConnection = async (dbName) => {
+  try {
+    const user = env('MONGODB_USER');
+    const password = env('MONGODB_PASSWORD');
+    const url = env('MONGODB_URL');
+    const db = env('MONGODB_CONTACTS_DB');
+
+    // Перевірка, яка база даних потрібна
+//     let db;
+// if (dbName === 'students') {
+//   db = env('MONGODB_STUDENTS_DB');
+// } else if (dbName === 'contacts') {
+//   db = env('MONGODB_CONTACTS_DB');
+// } else {
+//   throw new Error('Unknown database');
+// }
+
+    // Виведення значень у консоль для перевірки
+    // console.log({ user, password, url, db });
+
+    const DB_HOST = `mongodb+srv://${user}:${password}@${url}/${db}?retryWrites=true&w=majority&appName=Cluster0`;
+
+    await mongoose.connect(DB_HOST);
+    console.log('MongoDB connection succesfully');
+  } catch (error) {
+    console.log('MongoDB connection error', error.message);
+    throw error;
+  }
+};
