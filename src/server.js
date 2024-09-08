@@ -3,7 +3,6 @@ import cors from 'cors';
 import pino from 'pino-http';
 import { env } from './utils/env.js';
 
-import * as studentServices from "./services/students.js";
 import * as contactServices from './services/contacts.js';
 
 // це ми замінили ф-єю env
@@ -24,59 +23,34 @@ export const setupServer = () => {
   app.use(cors());
   app.use(express.json());
 
-    // routes
-    app.get("/students", async (req, res) => {
-        const data = await studentServices.getAllStudents();
+  // routes
 
-        res.json({
-            status: 200,
-            message: "Successsfully found students",
-            data,
-        })
+  app.get('/contacts', async (req, res) => {
+    const data = await contactServices.getAllContacts();
+
+    res.json({
+      status: 200,
+      message: 'Successsfully found contacts',
+      data,
     });
-    app.get('/contacts', async (req, res) => {
-      const data = await contactServices.getAllContacts();
+  });
 
-      res.json({
-        status: 200,
-        message: 'Successsfully found contacts',
-        data,
+  app.get('/contacts/:id', async (req, res) => {
+    const { id } = req.params;
+    const data = await contactServices.getContactById(id);
+
+    if (!data) {
+      return res.status(404).json({
+        message: `Contact with id=${id} not found`,
       });
+    }
+
+    res.json({
+      status: 200,
+      message: `Contactt wit ${id} successfully find`,
+      data,
     });
-
-    app.get("/students/:id", async(req, res) => {
-        const { id } = req.params;
-        const data = await studentServices.getStudentById(id);
-
-        if (!data) {
-           return res.status(404).json({
-                message: `Student with id=${id} not found`
-            });
-        }
-
-        res.json({
-            status: 200,
-            message: `Student wit ${id} successfully find`,
-            data,
-        })
-    })
-
-      app.get('/contacts/:id', async (req, res) => {
-        const { id } = req.params;
-        const data = await contactServices.getContactById(id);
-
-        if (!data) {
-          return res.status(404).json({
-            message: `Contact with id=${id} not found`,
-          });
-        }
-
-        res.json({
-          status: 200,
-          message: `Contactt wit ${id} successfully find`,
-          data,
-        });
-      });
+  });
 
   app.use((req, res) => {
     res.status(404).json({
