@@ -13,10 +13,12 @@ export const updateContact = async (filter, data, options = {}) => {
     ...options,
   });
 
-    if (rawResult || !rawResult.value) return null;
+    if (!rawResult || !rawResult.value) return null;
 
     return {
         data: rawResult.value,
         isNew: Boolean(rawResult?.lastErrorObject?.upserted),
     };
 };
+
+export const deleteContact = filter => ContactCollection.findOneAndDelete(filter);
