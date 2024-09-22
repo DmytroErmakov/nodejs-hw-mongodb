@@ -1,7 +1,7 @@
 {
-  "name": "hw2-mongodb",
+  "name": "hw3-crud",
   "version": "1.0.0",
-  "description": "hw2-mongodb",
+  "description": "hw3-crud",
   "type": "module",
   "main": "index.js",
   "scripts": {
