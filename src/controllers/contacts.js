@@ -22,7 +22,7 @@ export const getContactsByIdController = async (req, res) => {
 
   res.json({
     status: 200,
-    message: `Contactt with ${id} successfully find`,
+    message: `Contact with ${id} successfully find`,
     data,
   });
 };
@@ -32,7 +32,7 @@ export const addContactController = async (req, res) => {
 
   res.status(201).json({
     status: 201,
-    message: 'Contact add successfully',
+    message: 'Contact added successfully',
     data,
   });
 };
