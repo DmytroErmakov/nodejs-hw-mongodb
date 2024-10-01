@@ -3,8 +3,7 @@ import { Router } from 'express';
 // import { addContactController, getAllContactsController, getContactsByIdController, upsertContactController } from "../controllers/contacts.js";
 import * as contactControllers from '../controllers/contacts.js';
 
-
-import isValidId from '../middlewares/isValidId.js';
+import isValidId from '../middlewares/is.js';
 
 import ctrlWrapper from '../utils/ctrlWrapper.js';
 
