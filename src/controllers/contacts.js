@@ -4,7 +4,7 @@ import * as contactServices from '../services/contacts.js';
 
 import parsePaginationParams from "../utils/parsePaginationParams.js";
 
-import parseSortParams from "../utils/calculatePaginationData.js";
+import parseSortParams from "../utils/parseSortParams.js";
 import { sortFields } from "../db/models/Contact.js";
 
 // import parseContactFilterParams from '../utils/filters/parseContactFilterParams.js';
@@ -15,36 +15,46 @@ import {
 } from '../validation/contacts.js';
 
 export const getAllContactsController = async (req, res) => {
-  // console.log(req.query);
+
   const { perPage, page } = parsePaginationParams(req.query);
-  const { sortBy, sortOrder } = parseSortParams({...req.query, sortFields});
+
+  console.log('req.query:', req.query);
+
+  const { sortBy, sortOrder } = parseSortParams({ ...req.query, sortFields });
   // const filter = parseContactFilterParams(req.query);
   const { type, isFavourite } = req.query;
 
-   try {
-     const data = await contactServices.getContacts({
-       perPage,
-       page,
-       sortBy,
-       sortOrder,
-       //  filter,
-       type, // фільтр за типом
-       isFavorite: isFavourite === "true" ? true : isFavourite === "false" ? false : undefined // фільтр за обраними
-     });
+  console.log('sortBy:', sortBy); // Логує параметр сортування
+  console.log('sortOrder:', sortOrder); // Логує порядок сортування (asc або desc)
 
+  try {
+    const data = await contactServices.getContacts({
+      perPage,
+      page,
+      sortBy,
+      sortOrder,
+      //  filter,
+      type, // фільтр за типом
+      isFavorite:
+        isFavourite === 'true'
+          ? true
+          : isFavourite === 'false'
+          ? false
+          : undefined, // фільтр за обраними
+    });
 
-     res.json({
-       status: 200,
-       message: 'Successfully found contacts',
-       data,
-     });
-   } catch (error) {
-     res.status(500).json({
-       status: 500,
-       message: 'Error fetching contacts',
-       error: error.message,
-     });
-   }
+    res.json({
+      status: 200,
+      message: 'Successfully found contacts',
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'Error fetching contacts',
+      error: error.message,
+    });
+  }
 };
 
 export const getContactsByIdController = async (req, res) => {

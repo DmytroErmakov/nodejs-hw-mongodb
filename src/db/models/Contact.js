@@ -34,7 +34,6 @@ const contactSchema = new Schema(
     isFavourite: {
       type: Boolean,
       default: false,
-      required: true,
     },
     contactType: {
       type: String,
@@ -62,7 +61,7 @@ export const sortFields = [
   'isFavourite',
   'contactType',
   'createdAt',
-  'updatedAt'
+  'updatedAt',
 ];
 
 export default ContactCollection;
