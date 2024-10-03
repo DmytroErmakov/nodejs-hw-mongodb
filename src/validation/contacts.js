@@ -23,9 +23,7 @@ export const contactAddSchema = Joi.object({
     'string.pattern.base': 'Please fill a valid email address',
     'any.required': 'Email is required',
   }),
-  isFavourite: Joi.boolean().required().messages({
-    'any.required': 'isFavourite is required',
-  }),
+  isFavourite: Joi.boolean(),
   contactType: Joi.string()
     .valid(...contactTypeList)
     .required()
@@ -52,9 +50,7 @@ export const contactPatchSchema = Joi.object({
     'string.base': 'Email should be a string',
     'string.pattern.base': 'Please fill a valid email address',
   }),
-  isFavourite: Joi.boolean().messages({
-    'any.required': 'isFavourite is required',
-  }),
+  isFavourite: Joi.boolean(),
   contactType: Joi.string()
     .valid(...contactTypeList)
     .messages({
