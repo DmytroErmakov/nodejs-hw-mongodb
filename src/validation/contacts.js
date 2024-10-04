@@ -18,10 +18,9 @@ export const contactAddSchema = Joi.object({
     'string.pattern.base': 'Please provide a valid phone number',
     'any.required': 'Phone number is required',
   }),
-  email: Joi.string().pattern(emailRegexp).required().messages({
+  email: Joi.string().pattern(emailRegexp).messages({
     'string.base': 'Email should be a string',
     'string.pattern.base': 'Please fill a valid email address',
-    'any.required': 'Email is required',
   }),
   isFavourite: Joi.boolean(),
   contactType: Joi.string()
