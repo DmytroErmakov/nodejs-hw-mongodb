@@ -8,7 +8,10 @@ import notFoundHandler from './middlewares/notFoundHandler.js';
 import errorHandler from './middlewares/errorHandler.js';
 import logger from './middlewares/logger.js';
 
+import authRouter from './routers/auth.js';
 import contactsRouter from './routers/contacts.js';
+import connectDB from './db/connectDB.js';
+
 
 // це ми замінили ф-єю env
 // import dotenv from "dotenv";
@@ -17,14 +20,19 @@ import contactsRouter from './routers/contacts.js';
 
 
 // стартуємо сервер
-export const setupServer = () => {
+export const setupServer = async () => {
   const app = express();
 
   app.use(logger);
   app.use(cors());
   app.use(express.json());
 
+//  await connectDB();
+
   // routes
+  app.use("/auth", authRouter);
+
+
   app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
@@ -34,5 +42,5 @@ export const setupServer = () => {
   // виклткаємо ф-цію env
   const port = Number(env('PORT', 3000));
 
-  app.listen(port, console.log('Server running on port 3000'));
+  app.listen(port, () => console.log(`Server running on port ${port}`));
 };
