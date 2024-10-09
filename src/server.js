@@ -27,21 +27,22 @@ export const setupServer = () => {
   app.use(cors());
   app.use(express.json());
 
-//  await connectDB();
+  //  await connectDB();
 
   // routes
 
+  // кореневий маршрут
+  app.get('/', (req, res) => {
+    res.send('Welcome to the API!');
+  });
 
-
-
-  app.use("/auth", authRouter);
-
+  app.use('/auth', authRouter);
 
   app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
 
-    app.use(errorHandler);
+  app.use(errorHandler);
 
   // виклткаємо ф-цію env
   const port = Number(env('PORT', 3000));
