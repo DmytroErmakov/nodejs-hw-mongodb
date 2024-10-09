@@ -10,7 +10,7 @@ import logger from './middlewares/logger.js';
 
 import authRouter from './routers/auth.js';
 import contactsRouter from './routers/contacts.js';
-import connectDB from './db/connectDB.js';
+// import connectDB from './db/connectDB.js';
 
 
 // це ми замінили ф-єю env
@@ -20,7 +20,7 @@ import connectDB from './db/connectDB.js';
 
 
 // стартуємо сервер
-export const setupServer = async () => {
+export const setupServer = () => {
   const app = express();
 
   app.use(logger);
