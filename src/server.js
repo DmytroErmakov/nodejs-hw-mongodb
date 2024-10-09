@@ -30,6 +30,10 @@ export const setupServer = () => {
 //  await connectDB();
 
   // routes
+
+
+
+
   app.use("/auth", authRouter);
 
 
