@@ -1,6 +1,7 @@
 import * as authServices from '../services/auth.js';
 
 export const signupController = async (req, res) => {
+
     const newUser = await authServices.signup(req.body);
 
     res.status(201).json({
@@ -8,4 +9,5 @@ export const signupController = async (req, res) => {
       message: 'Successfully register user',
       data: newUser,
     });
-};
+
+  
