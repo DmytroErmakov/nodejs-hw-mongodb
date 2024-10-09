@@ -9,6 +9,7 @@ export const signupController = async (req, res) => {
       data: newUser,
     });
   } catch (error) {
+    console.error('Signup Error: ', error);
     res.status(400).json({
       status: 400,
       message: error.message || 'Failed to register user',
