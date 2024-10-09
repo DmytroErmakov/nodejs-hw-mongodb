@@ -30,13 +30,7 @@ export const setupServer = () => {
   //  await connectDB();
 
   // routes
-
-  // кореневий маршрут
-  app.get('/', (req, res) => {
-    res.send('Welcome to the API!');
-  });
-
-  app.use('/auth', authRouter);
+  app.use("/auth", authRouter);
 
   app.use('/contacts', contactsRouter);
 
