@@ -8,6 +8,7 @@ import notFoundHandler from './middlewares/notFoundHandler.js';
 import errorHandler from './middlewares/errorHandler.js';
 import logger from './middlewares/logger.js';
 
+import authRouter from './routers/auth.js';
 import contactsRouter from './routers/contacts.js';
 
 // це ми замінили ф-єю env
@@ -25,6 +26,7 @@ export const setupServer = () => {
   app.use(express.json());
 
   // routes
+  app.use("/auth", authRouter);
   app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
