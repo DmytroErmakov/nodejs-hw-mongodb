@@ -10,6 +10,8 @@ import logger from './middlewares/logger.js';
 
 import authRouter from './routers/auth.js';
 import contactsRouter from './routers/contacts.js';
+// import connectDB from './db/connectDB.js';
+
 
 // це ми замінили ф-єю env
 // import dotenv from "dotenv";
@@ -25,16 +27,19 @@ export const setupServer = () => {
   app.use(cors());
   app.use(express.json());
 
+  //  await connectDB();
+
   // routes
   app.use("/auth", authRouter);
+
   app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
 
-    app.use(errorHandler);
+  app.use(errorHandler);
 
   // виклткаємо ф-цію env
   const port = Number(env('PORT', 3000));
 
-  app.listen(port, console.log('Server running on port 3000'));
+  app.listen(port, () => console.log(`Server running on port ${port}`));
 };
