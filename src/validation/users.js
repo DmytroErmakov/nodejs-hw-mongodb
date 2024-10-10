@@ -6,3 +6,8 @@ export const userSignupSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
   password: Joi.string().min(6).required(), // тут необхідно вказати вимоги для пароля які символи використовувати
 });
+
+export const userSigninSchema = Joi.object({
+    email: Joi.string().pattern(emailRegexp).required(),
+  password: Joi.string().min(6).required(), // тут необхідно вказати вимоги для пароля які символи використовувати
+});
