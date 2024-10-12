@@ -1,5 +1,7 @@
 import * as authServices from '../services/auth.js';
 
+import { requestResetToken } from '../services/auth.js';
+
 const setupSession = (res, session) => {
 res.cookie('refreshToken', session.refreshToken, {
   httpOnly: true,
@@ -62,4 +64,18 @@ export const signoutController = async (req, res) => {
   res.clearCookie("refreshToken");
 
   res.status(204).send();
+};
+
+
+
+
+export const requestResetEmailController = async (req, res, next) => {
+  const { email } = req.body;
+  console.log('Received email:', email); // Додаємо логування
+  try {
+    await requestResetToken({ email });
+    res.status(200).json({ message: 'Reset email sent' });
+  } catch (error) {
+    next(error);
+  }
 };
