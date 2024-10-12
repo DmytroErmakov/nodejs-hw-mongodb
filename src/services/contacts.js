@@ -8,15 +8,19 @@ export const getContacts = async ({
   page,
   sortBy = '_id',
   sortOrder = SORT_ORDER[0],
-  // filter = {},
+  filter = {},
   type,
   isFavourite,
 }) => {
 
-  const filter = {}; // створюємо об'єкт для фільтрації
+  // const filter = {}; // створюємо об'єкт для фільтрації
 
   if (type) {
     filter.contactType = type; // фільтрація за типом
+  }
+
+  if (filter.userId) {
+    ContactCollection.where("userId").equals(filter.userId);
   }
 
   if (typeof isFavourite !== "undefined") {
@@ -39,7 +43,7 @@ export const getContacts = async ({
   };
 };
 
-export const getContactById = (id) => ContactCollection.findById(id);
+export const getContact = filter => ContactCollection.findById(filter);
 
 export const createContact = (payload) => ContactCollection.create(payload);
 
