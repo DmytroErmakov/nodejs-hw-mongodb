@@ -21,7 +21,7 @@ import contactsRouter from './routers/contacts.js';
 
 
 // стартуємо сервер
-export const setupServer = () => {
+export const setupServer = async () => {
   const app = express();
 
 
