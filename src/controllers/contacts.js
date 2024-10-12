@@ -7,7 +7,7 @@ import parsePaginationParams from "../utils/parsePaginationParams.js";
 import parseSortParams from "../utils/parseSortParams.js";
 import { sortFields } from "../db/models/Contact.js";
 
-// import parseContactFilterParams from '../utils/filters/parseContactFilterParams.js';
+import parseContactFilterParams from '../utils/filters/parseContactFilterParams.js';
 
 import {
   contactAddSchema,
@@ -15,14 +15,17 @@ import {
 } from '../validation/contacts.js';
 
 export const getAllContactsController = async (req, res) => {
-
   const { perPage, page } = parsePaginationParams(req.query);
 
   console.log('req.query:', req.query);
 
   const { sortBy, sortOrder } = parseSortParams({ ...req.query, sortFields });
-  // const filter = parseContactFilterParams(req.query);
+
+  const filter = parseContactFilterParams(req.query);
   const { type, isFavourite } = req.query;
+
+  // додаємо інфо про юзера
+  const { _id: userId } = req.user;
 
   console.log('sortBy:', sortBy); // Логує параметр сортування
   console.log('sortOrder:', sortOrder); // Логує порядок сортування (asc або desc)
@@ -33,7 +36,7 @@ export const getAllContactsController = async (req, res) => {
       page,
       sortBy,
       sortOrder,
-      //  filter,
+      filter: { ...filter, userId },
       type, // фільтр за типом
       isFavorite:
         isFavourite === 'true'
@@ -59,9 +62,10 @@ export const getAllContactsController = async (req, res) => {
 
 export const getContactsByIdController = async (req, res) => {
   const { id } = req.params;
+    const { _id: userId } = req.user;
 
   try {
-    const data = await contactServices.getContactById(id);
+    const data = await contactServices.getContact({ _id: id, userId });
 
     if (!data) {
       throw createHttpError(404, `Contact with id=${id} not found`);
@@ -98,8 +102,10 @@ export const addContactController = async (req, res) => {
     });
     console.log('Validation success');
 
+    // отримуємо юзера
+    const { _id: userId } = req.user;
     // Створюємо контакт
-    const data = await contactServices.createContact(req.body);
+    const data = await contactServices.createContact({ ...req.body, userId });
 
     res.status(201).json({
       status: 201,
@@ -144,11 +150,12 @@ export const upsertContactController = async (req, res) => {
   }
 
   const { id } = req.params;
+    const { _id: userId } = req.user;
 
   try {
     // Оновлення або вставка контакту
     const { isNew, data } = await contactServices.updateContact(
-      { _id: id },
+      { _id: id, userId },
       req.body,
       { upsert: true },
     );
@@ -173,10 +180,11 @@ export const upsertContactController = async (req, res) => {
 
 export const patchContactController = async (req, res) => {
   const { id } = req.params;
+    const { _id: userId } = req.user;
 
   try {
     // Оновлення контакту
-    const result = await contactServices.updateContact({ _id: id }, req.body);
+    const result = await contactServices.updateContact({ _id: id, userId }, req.body);
 
     if (!result) {
       throw createHttpError(404, `Contact with id=${id} not found`);
@@ -209,7 +217,8 @@ export const patchContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res) => {
   const { id } = req.params;
-  const data = await contactServices.deleteContact({ _id: id });
+    const { _id: userId } = req.user;
+  const data = await contactServices.deleteContact({ _id: id, userId });
 
   if (!data) {
     throw createHttpError(404, `Contact with id=${id} not found`);
