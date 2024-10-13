@@ -18,6 +18,7 @@ import fs from 'node:fs/promises';
 
 
 
+// Функція для створення сесії
 const createSession = () => {
   const accessToken = randomBytes(30).toString('base64');
   const refreshToken = randomBytes(30).toString('base64');
@@ -32,32 +33,38 @@ const createSession = () => {
 };
 
 export const register = async (payload) => {
-    const { email, password } = payload;
-    const user = await UserCollection.findOne({ email });
-    if (user) {
-        throw createHttpError(409, "Email in use");
-    }
+  const { email, password } = payload;
 
-    const hashPassword = await bcrypt.hash(password, 10);
-    const data = await UserCollection.create({...payload, password: hashPassword});
-    delete data._doc.password;
+  const user = await UserCollection.findOne({ email });
+  if (user) {
+    throw createHttpError(409, 'Email in use');
+  }
 
-    return data._doc;
+  const hashPassword = await bcrypt.hash(password, 10);
+  const data = await UserCollection.create({
+    ...payload,
+    password: hashPassword,
+  });
+
+  delete data._doc.password; // Видалити пароль перед поверненням
+
+  return data._doc;
 };
 
 export const login = async (payload) => {
-    const { email, password } = payload;
-    const user = await UserCollection.findOne({ email });
-    if (!user) {
-        throw createHttpError(401, "Email or password invalid");
-    }
+  const { email, password } = payload;
 
-    const passwordCompare = await bcrypt.compare(password, user.password);
-     if (!passwordCompare) {
-       throw createHttpError(401, 'Email or password invalid');
-     }
+  const user = await UserCollection.findOne({ email });
+  if (!user) {
+    throw createHttpError(401, 'Email or password invalid');
+  }
 
-    await SessionCollection.deleteOne({ userId: user.id });
+  const passwordCompare = await bcrypt.compare(password, user.password);
+  if (!passwordCompare) {
+    throw createHttpError(401, 'Email or password invalid');
+  }
+
+  await SessionCollection.deleteOne({ userId: user.id }); // Видалити попередню сесію
 
   const sessionData = createSession();
   const userSession = await SessionCollection.create({
@@ -67,9 +74,11 @@ export const login = async (payload) => {
   return userSession;
 };
 
+// Знайти сесію за токеном доступу
 export const findSessionByAccessToken = (accessToken) =>
   SessionCollection.findOne({ accessToken });
 
+// Оновлення сесії
 export const refreshSession = async ({ refreshToken, sessionId }) => {
   const oldSession = await SessionCollection.findOne({
     _id: sessionId,
@@ -84,15 +93,17 @@ export const refreshSession = async ({ refreshToken, sessionId }) => {
   await SessionCollection.deleteOne({ _id: sessionId });
   const sessionData = createSession();
   const userSession = await SessionCollection.create({
-    userId: oldSession._id,
+    userId: oldSession.userId,
     ...sessionData,
   });
   return userSession;
 };
 
+// Вихід з системи
 export const logout = async (sessionId) => {
   await SessionCollection.deleteOne({ _id: sessionId });
 };
+
 
 export const requestResetToken = async (payload) => {
   const { email } = payload;
