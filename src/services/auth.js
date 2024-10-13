@@ -1,13 +1,22 @@
 import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
 import { randomBytes } from 'crypto';
-
 import SessionCollection from '../db/models/Session.js';
 import UserCollection from '../db/models/User.js';
 import {
   accessTokenLifetime,
   refreshTokenLifetime,
 } from '../constants/index.js';
+import jwt from 'jsonwebtoken';
+import { SMTP, TEMPLATES_DIR } from '../constants/index.js';
+import { env } from '../utils/env.js';
+import { sendEmail } from '../utils/sendMail.js';
+
+import handlebars from 'handlebars';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
+
 
 // Функція для створення сесії
 const createSession = () => {
@@ -15,7 +24,6 @@ const createSession = () => {
   const refreshToken = randomBytes(30).toString('base64');
   const accessTokenValidUntil = new Date(Date.now() + accessTokenLifetime);
   const refreshTokenValidUntil = new Date(Date.now() + refreshTokenLifetime);
-
   return {
     accessToken,
     refreshToken,
@@ -63,7 +71,6 @@ export const login = async (payload) => {
     userId: user._id,
     ...sessionData,
   });
-
   return userSession;
 };
 
@@ -77,23 +84,18 @@ export const refreshSession = async ({ refreshToken, sessionId }) => {
     _id: sessionId,
     refreshToken,
   });
-
   if (!oldSession) {
     throw createHttpError(401, 'Session not found');
   }
-
   if (new Date() > oldSession.refreshTokenValidUntil) {
     throw createHttpError(401, 'Session token expired');
   }
-
   await SessionCollection.deleteOne({ _id: sessionId });
-
   const sessionData = createSession();
   const userSession = await SessionCollection.create({
     userId: oldSession.userId,
     ...sessionData,
   });
-
   return userSession;
 };
 
@@ -102,5 +104,55 @@ export const logout = async (sessionId) => {
   await SessionCollection.deleteOne({ _id: sessionId });
 };
 
-// Знайти користувача за фільтром
+
+export const requestResetToken = async (payload) => {
+  const { email } = payload;
+  console.log('Email:', email); // Логування email
+
+  const user = await UserCollection.findOne({ email });
+  if (!user) {
+    console.log('User not found for email:', email); // Логування, якщо користувача не знайдено
+    throw createHttpError(404, 'User not found');
+  }
+
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      email,
+    },
+    env('JWT_SECRET'),
+    {
+      expiresIn: '15m',
+    },
+  );
+
+  const resetPasswordTemplatePath = path.join(
+    TEMPLATES_DIR,
+    'reset-password-email.html',
+  );
+
+  const templateSource = (
+    await fs.readFile(resetPasswordTemplatePath)
+  ).toString();
+
+  const template = handlebars.compile(templateSource);
+  const html = template({
+    name: user.username,
+    link: `${env('APP_DOMAIN')}/reset-password?token=${resetToken}`,
+  });
+
+  try {
+    await sendEmail({
+      from: env(SMTP.SMTP_FROM),
+      to: email,
+      subject: 'Reset your password',
+      // html: `<p>Click <a href="${resetToken}">here</a> to reset your password!</p>`,
+      html: html, // Використовуємо згенерований HTML з шаблону
+    });
+  } catch (error) {
+    console.log('Error sending email:', error.message); // Логування помилки при відправці email
+    throw createHttpError(500, 'Error sending email');
+  }
+};
+
 export const findUser = (filter) => UserCollection.findOne(filter);

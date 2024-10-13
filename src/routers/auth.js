@@ -6,8 +6,13 @@ import ctrlWrapper from '../utils/ctrlWrapper.js';
 
 import validateBody from '../utils/validateBody.js';
 
-import { userRegisterSchema, userLoginSchema } from '../validation/users.js';
+import {
+  userRegisterSchema,
+  userLoginSchema,  
+  requestResetEmailSchema,
+} from '../validation/users.js';
 
+import { requestResetEmailController } from '../controllers/auth.js';
 
 const authRouter = Router();
 // регістрація нового юзера
@@ -22,5 +27,11 @@ authRouter.post(
 authRouter.post("/refresh", ctrlWrapper(authControllers.refreshController));
 // вихід юзера
 authRouter.post('/logout', ctrlWrapper(authControllers.logoutController));
+
+authRouter.post(
+  '/request-reset-email',
+  validateBody(requestResetEmailSchema),
+  ctrlWrapper(requestResetEmailController),
+);
 
 export default authRouter;

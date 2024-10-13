@@ -1,5 +1,7 @@
 import * as authServices from '../services/auth.js';
 
+import { requestResetToken } from '../services/auth.js';
+
 const setupSession = (res, session) => {
 res.cookie('refreshToken', session.refreshToken, {
   httpOnly: true,
@@ -66,9 +68,8 @@ export const refreshController = async (req, res, next) => {
   }
 };
 
-export const logoutController = async (req, res, next) => {
-  try {
-  const { sessionId } = req.cookies;
+export const logoutController = async (req, res) => {
+   const { sessionId } = req.cookies;
   if (sessionId) {
     await authServices.logout(sessionId);
   }
@@ -77,7 +78,20 @@ export const logoutController = async (req, res, next) => {
   res.clearCookie("refreshToken");
 
   res.status(204).send();
-   } catch (error) {
-    next(error); // Передаємо помилку в middleware для обробки помилок
-   }
-  };
+
+};
+
+
+
+
+export const requestResetEmailController = async (req, res, next) => {
+  const { email } = req.body;
+  console.log('Received email:', email); // Додаємо логування
+  try {
+    await requestResetToken({ email });
+    res.status(200).json({ message: 'Reset email sent' });
+  } catch (error) {
+    next(error);
+  }
+};
+
