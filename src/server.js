@@ -2,6 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import { env } from './utils/env.js';
 
 // імпортуємо винесені midleware
@@ -11,6 +15,7 @@ import logger from './middlewares/logger.js';
 
 import authRouter from './routers/auth.js';
 import contactsRouter from './routers/contacts.js';
+import userRouter from './routers/userRoutes.js';
 // import connectDB from './db/connectDB.js';
 
 
@@ -21,7 +26,7 @@ import contactsRouter from './routers/contacts.js';
 
 
 // стартуємо сервер
-export const setupServer = () => {
+export const setupServer = async () => {
   const app = express();
 
 
@@ -33,6 +38,8 @@ export const setupServer = () => {
   //  await connectDB();
 
   // routes
+  app.use('/api/users', userRouter);
+
   app.use("/auth", authRouter);
 
   app.use('/contacts', contactsRouter);
