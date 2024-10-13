@@ -1,12 +1,8 @@
 import { Schema, model } from 'mongoose';
 
-
 import { emailRegexp } from "../../constants/users.js";
 
-
 import { handleSaveError, setUpdateOptions } from './hooks.js';
-
-
 
 const userSchema = new Schema({
     username: {
@@ -24,8 +20,6 @@ const userSchema = new Schema({
         required: true,
     }
 }, { versionKey: false, timestamps: true });
-
-
 
 userSchema.post('save', handleSaveError);
 
