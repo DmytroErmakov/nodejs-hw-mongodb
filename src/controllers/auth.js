@@ -2,6 +2,9 @@ import * as authServices from '../services/auth.js';
 
 import { requestResetToken } from '../services/auth.js';
 
+import { resetPassword } from '../services/auth.js';
+
+
 const setupSession = (res, session) => {
 res.cookie('refreshToken', session.refreshToken, {
   httpOnly: true,
@@ -66,9 +69,6 @@ export const signoutController = async (req, res) => {
   res.status(204).send();
 };
 
-
-
-
 export const requestResetEmailController = async (req, res, next) => {
   const { email } = req.body;
   console.log('Received email:', email); // Додаємо логування
@@ -78,4 +78,13 @@ export const requestResetEmailController = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const resetPasswordController = async (req, res) => {
+  await resetPassword(req.body);
+  res.json({
+    message: 'Password was successfully reset!',
+    status: 200,
+    data: {},
+  });
 };
